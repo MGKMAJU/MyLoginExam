@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import { Text } from "react-native";
 import firebase from "firebase";
-import SignUpForm from "./components/SignUpForm";
 // import { TextInput } from "react-native";
 import { CustomButton, Card, CardSection, Input, Spinner } from "./common";
 
@@ -20,14 +19,26 @@ class LoginForm extends Component {
     //Firebase authentication with Email and password
     firebase
         .auth()
-        .signInWithEmailAndPassword(email, password)
-        .then(() => this.props.navigation.navigate('Dashboard'))
-        .catch(error => this.setState({ errorMessage: error.message }))
+        .createUserWithEmailAndPassword(email, password)
+        .then(this.props.navigation.navigate('Dashboard'))
+        .catch(error => this.setState({ errorMessage: error.message }));
     }
     //functions on failed
-     
+    onLoginFailed() {
+        this.setState({
+            error: "Authentication Failed",
+            loading: false
+        });
+    }
     //function on success
-    
+    onLoginSuccess() {
+        this.setState({
+            email: "",
+            password: "",
+            loading: false,
+            error: ""
+        });
+    }
     //render button 
     renderButton() {
     if (this.state.loading) {
@@ -35,7 +46,7 @@ class LoginForm extends Component {
     }
     return (
         <CustomButton onPress={this.onButtonPress.bind(this)}>
-            Sign In
+            Sign Up
         </CustomButton>
     );
     }
@@ -43,11 +54,12 @@ class LoginForm extends Component {
     render() {
         return (
             <Card>
-                {this.state.errorMessage &&
+                 {this.state.errorMessage &&
                 <Text style={{ color: 'red' }}>
                     {this.state.errorMessage}
                 </Text>}
                 <CardSection>
+                 
                 <Input
                     autoCorrect
                     placeholder="user@email.com"
@@ -72,9 +84,6 @@ class LoginForm extends Component {
                 <CardSection>
                     {this.renderButton()}
                 </CardSection>
-                <CustomButton onPress={ this.props.navigation.navigate('SignUpForm')}>
-                    Sign Up
-                </CustomButton>
             </Card>
     );
     }
